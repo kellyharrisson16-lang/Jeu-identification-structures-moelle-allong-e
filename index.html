@@ -1,0 +1,1316 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Identification des structures de la moelle allongée</title>
+
+<style>
+:root {
+  --bg: #101827;
+  --panel: #192538;
+  --panel2: #223149;
+  --text: #f1f5f9;
+  --muted: #9eacc0;
+  --blue: #62b5e8;
+  --purple: #a78bfa;
+  --green: #4ade80;
+  --red: #fb7185;
+  --border: #34445d;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 30px 16px;
+  background:
+    radial-gradient(circle at top left, #243752 0, transparent 38%),
+    var(--bg);
+  color: var(--text);
+  font-family: Arial, sans-serif;
+}
+
+.container {
+  max-width: 1050px;
+  margin: auto;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.tag {
+  display: inline-block;
+  color: var(--blue);
+  background: #213b55;
+  padding: 7px 14px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+h1 {
+  font-size: 30px;
+  margin: 5px 0 10px;
+}
+
+.subtitle {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: bold;
+  margin: 0 0 7px;
+}
+
+.section-description {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 0 0 17px;
+  line-height: 1.5;
+}
+
+/* NAVIGATION */
+
+.navigation {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.nav-btn {
+  flex: 1;
+  max-width: 230px;
+  padding: 14px 12px;
+  background: #223149;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  font-size: 14px;
+}
+
+.nav-btn.active {
+  background: linear-gradient(135deg, #315b7d, #514b80);
+  border-color: var(--blue);
+  color: white;
+}
+
+.nav-btn:hover {
+  filter: brightness(1.15);
+}
+
+/* PROGRESSION */
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 10px;
+  gap: 10px;
+}
+
+.progress-track {
+  height: 9px;
+  background: #0e1725;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--blue), var(--purple));
+  border-radius: 20px;
+  transition: width 0.3s;
+}
+
+/* IMAGES */
+
+.image-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #111c2c;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 15px;
+  overflow: hidden;
+}
+
+.image-stage {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  line-height: 0;
+}
+
+.anatomy-image {
+  display: block;
+  max-width: 100%;
+  max-height: 650px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 5px;
+}
+
+/* ZONES */
+
+.drop-zone {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 95px;
+  min-height: 65px;
+  padding: 7px;
+  border: 2px dashed var(--blue);
+  border-radius: 9px;
+  background: rgba(17, 34, 54, 0.94);
+  color: #dceeff;
+  font-size: 12px;
+  font-weight: bold;
+  line-height: 1.3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+  transition: 0.2s;
+  z-index: 2;
+}
+
+.drop-zone:hover,
+.drop-zone.drag-over {
+  background: #315477;
+  border-color: #a5dcff;
+  transform: translate(-50%, -50%) scale(1.04);
+}
+
+.drop-zone.has-label {
+  border-style: solid;
+  background: #263e59;
+}
+
+.drop-zone.correct {
+  border: 2px solid var(--green);
+  background: rgba(20, 75, 52, 0.97);
+  color: #c8f9dc;
+}
+
+.drop-zone.incorrect {
+  border: 2px solid var(--red);
+  background: rgba(90, 35, 51, 0.97);
+  color: #ffe0e6;
+}
+
+.zone-placeholder {
+  pointer-events: none;
+}
+
+/* ÉTIQUETTES */
+
+.label-bank {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  min-height: 65px;
+  padding: 15px;
+  background: #111c2c;
+  border: 1px dashed #52647e;
+  border-radius: 11px;
+}
+
+.draggable-label {
+  background: linear-gradient(135deg, #315b7d, #514b80);
+  color: white;
+  border: 1px solid #6c8eae;
+  border-radius: 9px;
+  padding: 11px 15px;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: grab;
+  user-select: none;
+  line-height: 1.3;
+  transition: 0.2s;
+}
+
+.draggable-label:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.15);
+}
+
+.draggable-label:active {
+  cursor: grabbing;
+}
+
+.draggable-label.dragging {
+  opacity: 0.4;
+}
+
+.drop-zone .draggable-label {
+  width: 100%;
+  margin: 0;
+  cursor: grab;
+  padding: 5px;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  font-size: 12px;
+  text-align: center;
+}
+
+.drop-zone .draggable-label:hover {
+  transform: none;
+  filter: none;
+}
+
+.bank-empty {
+  color: var(--muted);
+  font-size: 13px;
+  align-self: center;
+}
+
+/* BOUTONS */
+
+.actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 25px 0;
+}
+
+button {
+  border: none;
+  border-radius: 10px;
+  padding: 13px 23px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.check-btn {
+  background: linear-gradient(135deg, #4ca9df, #8b83e8);
+  color: white;
+}
+
+.check-btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+}
+
+.reset-btn {
+  background: #2b3a50;
+  color: #dce6f2;
+  border: 1px solid var(--border);
+}
+
+.reset-btn:hover {
+  background: #394d68;
+}
+
+/* RÉSULTATS */
+
+.result {
+  display: none;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 25px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.result h2 {
+  margin: 0 0 10px;
+}
+
+.score {
+  font-size: 38px;
+  font-weight: bold;
+  color: var(--blue);
+  margin: 12px 0;
+}
+
+.result-message {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.final-result {
+  display: none;
+  background: linear-gradient(135deg, #213b55, #302d50);
+  border: 1px solid #536b91;
+  border-radius: 16px;
+  padding: 25px;
+  text-align: center;
+  margin: 25px 0;
+}
+
+.final-result h2 {
+  margin-top: 0;
+}
+
+.final-score {
+  font-size: 35px;
+  font-weight: bold;
+  color: #a5dcff;
+  margin: 12px 0;
+}
+
+.image-panel {
+  display: none;
+}
+
+.image-panel.active {
+  display: block;
+}
+
+@media (max-width: 600px) {
+  body {
+    padding: 20px 10px;
+  }
+
+  h1 {
+    font-size: 24px;
+  }
+
+  .drop-zone {
+    width: 80px;
+    min-height: 45px;
+    font-size: 10px;
+    padding: 4px;
+  }
+
+  .image-wrapper {
+    padding: 6px;
+  }
+
+  .draggable-label {
+    font-size: 12px;
+  }
+
+  .navigation {
+    gap: 8px;
+  }
+
+  .nav-btn {
+    font-size: 12px;
+    padding: 12px 6px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <header>
+    <div class="tag">Jeu d'identification</div>
+    <h1>Identification des structures de la moelle allongée</h1>
+    <p class="subtitle">
+      Glisse chaque étiquette dans la zone correspondant à la structure sur l'image.
+    </p>
+  </header>
+
+  <!-- NAVIGATION ENTRE LES TROIS IMAGES -->
+
+  <div class="navigation">
+
+    <button class="nav-btn active" id="nav0" onclick="changerImage(0)">
+      Image 1
+    </button>
+
+    <button class="nav-btn" id="nav1" onclick="changerImage(1)">
+      Image 2
+    </button>
+
+    <button class="nav-btn" id="nav2" onclick="changerImage(2)">
+      Image 3
+    </button>
+
+  </div>
+
+  <!-- PROGRESSION GLOBALE -->
+
+  <div class="card">
+    <div class="progress-info">
+      <span>Progression globale</span>
+      <span id="globalProgressText">0 / 7 structures placées</span>
+    </div>
+
+    <div class="progress-track">
+      <div class="progress-fill" id="globalProgressFill"></div>
+    </div>
+  </div>
+
+  <!-- CONTENEUR DES TROIS JEUX -->
+
+  <div id="gamesContainer"></div>
+
+  <!-- RÉSULTAT GLOBAL -->
+
+  <div class="final-result" id="finalResult">
+    <h2>Résultat final</h2>
+    <div class="final-score" id="finalScore"></div>
+    <p id="finalMessage"></p>
+  </div>
+
+  <div class="actions">
+    <button class="reset-btn" onclick="recommencerTout()">
+      Recommencer les trois images
+    </button>
+  </div>
+
+</div>
+
+<script>
+
+// ==================================================
+// CONFIGURATION DES TROIS JEUX
+// ==================================================
+
+// IMAGE 1 : PARAMÈTRES ORIGINAUX CONSERVÉS
+
+const jeux = [
+
+  {
+    titre: "Image 1",
+    image: "ma-1.jpeg",
+
+    structures: [
+
+      {
+        nom: "Noyau dorsal du nerf vague",
+        x: 38,
+        y: 15
+      },
+
+      {
+        nom: "Plexus choroïde",
+        x: 55,
+        y: 15
+      },
+
+      {
+        nom: "Fosse rhomboïde",
+        x: 70,
+        y: 15
+      },
+
+      {
+        nom: "Noyau du nerf hypoglosse",
+        x: 87,
+        y: 27
+      },
+
+      {
+        nom: "Noyau olivaire inférieur",
+        x: 88,
+        y: 70
+      },
+
+      {
+        nom: "Lemnisque médial",
+        x: 53,
+        y: 90
+      },
+
+      {
+        nom: "Tractus pyramidal",
+        x: 38,
+        y: 90
+      }
+
+    ]
+  },
+
+  // IMAGE 2 : CONFIGURATION À COMPLÉTER
+
+  {
+    titre: "Image 2",
+    image: "ma-2.jpeg",
+
+    structures: [
+     {
+        nom: "Noyau cunéiforme",
+        x: 37,
+        y: 10
+     },
+     {
+        nom: "Noyau gracile",
+        x: 52,
+        y: 10
+     }
+      // Ajoute tes structures ici.
+      // Exemple :
+      //
+      // {
+      //   nom: "Nom de la structure",
+      //   x: 52,
+      //   y: 50
+      // },
+
+    ]
+  },
+
+  // IMAGE 3 : CONFIGURATION À COMPLÉTER
+
+  {
+    titre: "Image 3",
+    image: "ma-3.jpeg",
+
+    structures: [ 
+     {
+        nom: "Décussation pyramidale",
+        x: 90,
+        y: 55
+     }
+      // Exemple :
+      //
+      // {
+      //   nom: "Nom de la structure",
+      //   x: 50,
+      //   y: 50
+      // },
+
+    ]
+  }
+
+];
+
+// ==================================================
+// ÉTAT DES TROIS JEUX
+// ==================================================
+
+let imageActive = 0;
+
+const etats = jeux.map(() => ({
+  corrige: false,
+  score: null,
+  glissee: null,
+  zoneSource: null
+}));
+
+// ==================================================
+// CONSTRUIRE LES INTERFACES
+// ==================================================
+
+function construireInterfaces() {
+
+  const conteneur = document.getElementById("gamesContainer");
+
+  conteneur.innerHTML = "";
+
+  jeux.forEach((jeu, index) => {
+
+    const panel = document.createElement("div");
+
+    panel.className = "image-panel" + (index === 0 ? " active" : "");
+    panel.id = "panel" + index;
+
+    panel.innerHTML = `
+
+      <div class="card">
+
+        <div class="progress-info">
+          <strong>${jeu.titre}</strong>
+          <span id="progressText${index}">0 / ${jeu.structures.length} structures placées</span>
+        </div>
+
+        <div class="progress-track">
+          <div class="progress-fill" id="progressFill${index}"></div>
+        </div>
+
+      </div>
+
+      <div class="card">
+
+        <h2 class="section-title">${jeu.titre} – Identification</h2>
+
+        <p class="section-description">
+          Dépose les étiquettes dans les zones correspondant aux structures.
+        </p>
+
+        <div class="image-wrapper">
+          <div class="image-stage" id="imageStage${index}">
+
+            <img
+              class="anatomy-image"
+              id="anatomyImage${index}"
+              src="${jeu.image}"
+              alt="Image anatomique ${index + 1}"
+            >
+
+          </div>
+        </div>
+
+      </div>
+
+      <div class="card">
+
+        <h2 class="section-title">Banque d'étiquettes – ${jeu.titre}</h2>
+
+        <p class="section-description">
+          Cette banque contient uniquement les étiquettes de cette image.
+        </p>
+
+        <div class="label-bank" id="labelBank${index}"></div>
+
+      </div>
+
+      <div class="actions">
+
+        <button class="check-btn" onclick="verifier(${index})">
+          Corriger mes réponses
+        </button>
+
+        <button class="reset-btn" onclick="recommencer(${index})">
+          Recommencer cette image
+        </button>
+
+      </div>
+
+      <div class="result" id="result${index}">
+
+        <h2>Résultat – ${jeu.titre}</h2>
+
+        <div class="score" id="score${index}"></div>
+
+        <p class="result-message" id="message${index}"></p>
+
+      </div>
+
+    `;
+
+    conteneur.appendChild(panel);
+
+  });
+
+}
+
+// ==================================================
+// OUTILS
+// ==================================================
+
+function melanger(tableau) {
+
+  const copie = [...tableau];
+
+  for (let i = copie.length - 1; i > 0; i--) {
+
+    const j = Math.floor(Math.random() * (i + 1));
+
+    [copie[i], copie[j]] = [copie[j], copie[i]];
+
+  }
+
+  return copie;
+
+}
+
+function afficherPlaceholder(zone) {
+
+  const placeholder = document.createElement("span");
+
+  placeholder.className = "zone-placeholder";
+
+  placeholder.textContent =
+    "Zone " + (Number(zone.dataset.index) + 1);
+
+  zone.appendChild(placeholder);
+
+}
+
+// ==================================================
+// CRÉER LES ZONES
+// ==================================================
+
+function creerZones(index) {
+
+  const jeu = jeux[index];
+
+  const stage = document.getElementById("imageStage" + index);
+
+  stage.querySelectorAll(".drop-zone").forEach(zone => {
+    zone.remove();
+  });
+
+  jeu.structures.forEach((structure, numero) => {
+
+    const zone = document.createElement("div");
+
+    zone.className = "drop-zone";
+    zone.dataset.index = numero;
+
+    afficherPlaceholder(zone);
+
+    zone.style.left = structure.x + "%";
+    zone.style.top = structure.y + "%";
+
+    zone.addEventListener("dragover", event => dragOver(event, index));
+
+    zone.addEventListener("dragleave", dragLeave);
+
+    zone.addEventListener("drop", event => deposerEtiquette(event, index));
+
+    stage.appendChild(zone);
+
+  });
+
+  mettreAJourProgression(index);
+
+}
+
+// ==================================================
+// CRÉER LES BANQUES INDÉPENDANTES
+// ==================================================
+
+function creerEtiquettes(index) {
+
+  const banque = document.getElementById("labelBank" + index);
+
+  banque.innerHTML = "";
+
+  const structures = jeux[index].structures;
+
+  if (structures.length === 0) {
+
+    const message = document.createElement("span");
+
+    message.className = "bank-empty";
+
+    message.textContent =
+      "Ajoute les structures de cette image dans la configuration du code.";
+
+    banque.appendChild(message);
+
+    return;
+
+  }
+
+  const etiquettes = melanger(
+    structures.map((structure, numero) => ({
+      nom: structure.nom,
+      index: numero
+    }))
+  );
+
+  etiquettes.forEach(item => {
+
+    const etiquette = document.createElement("div");
+
+    etiquette.className = "draggable-label";
+    etiquette.textContent = item.nom;
+    etiquette.draggable = true;
+    etiquette.dataset.index = item.index;
+
+    etiquette.addEventListener("dragstart", function(event) {
+
+      if (etats[index].corrige) {
+        event.preventDefault();
+        return;
+      }
+
+      etats[index].glissee = etiquette;
+
+      etats[index].zoneSource =
+        etiquette.parentElement.classList.contains("drop-zone")
+          ? etiquette.parentElement
+          : null;
+
+      event.dataTransfer.setData("text/plain", String(item.index));
+      event.dataTransfer.effectAllowed = "move";
+
+      etiquette.classList.add("dragging");
+
+    });
+
+    etiquette.addEventListener("dragend", function() {
+
+      etiquette.classList.remove("dragging");
+
+      etats[index].glissee = null;
+      etats[index].zoneSource = null;
+
+    });
+
+    banque.appendChild(etiquette);
+
+  });
+
+}
+
+// ==================================================
+// GLISSER ET DÉPOSER
+// ==================================================
+
+function dragOver(event, index) {
+
+  if (etats[index].corrige) return;
+
+  event.preventDefault();
+
+  event.currentTarget.classList.add("drag-over");
+
+}
+
+function dragLeave(event) {
+
+  event.currentTarget.classList.remove("drag-over");
+
+}
+
+function deposerEtiquette(event, index) {
+
+  event.preventDefault();
+
+  const zone = event.currentTarget;
+  const etat = etats[index];
+
+  zone.classList.remove("drag-over");
+
+  if (etat.corrige || !etat.glissee) return;
+
+  if (etat.zoneSource === zone) return;
+
+  // Une étiquette déjà présente retourne dans SA banque.
+
+  const ancienne = zone.querySelector(".draggable-label");
+
+  if (ancienne) {
+
+    document.getElementById("labelBank" + index).appendChild(ancienne);
+
+  }
+
+  // Libérer l'ancienne zone de l'étiquette déplacée.
+
+  if (etat.zoneSource) {
+
+    etat.zoneSource.classList.remove(
+      "has-label",
+      "correct",
+      "incorrect"
+    );
+
+    afficherPlaceholder(etat.zoneSource);
+
+  }
+
+  // Déposer la nouvelle étiquette.
+
+  const placeholder = zone.querySelector(".zone-placeholder");
+
+  if (placeholder) {
+    placeholder.remove();
+  }
+
+  zone.appendChild(etat.glissee);
+
+  zone.classList.add("has-label");
+
+  // Annuler l'ancien résultat si les réponses changent.
+
+  document.getElementById("result" + index).style.display = "none";
+
+  etat.score = null;
+
+  mettreAJourProgression(index);
+  mettreAJourResultatGlobal();
+
+}
+
+// ==================================================
+// PROGRESSION
+// ==================================================
+
+function mettreAJourProgression(index) {
+
+  const zones = document.querySelectorAll(
+    "#imageStage" + index + " .drop-zone"
+  );
+
+  let remplis = 0;
+
+  zones.forEach(zone => {
+
+    if (zone.querySelector(".draggable-label")) {
+      remplis++;
+    }
+
+  });
+
+  const total = jeux[index].structures.length;
+
+  document.getElementById("progressText" + index).textContent =
+    `${remplis} / ${total} structures placées`;
+
+  document.getElementById("progressFill" + index).style.width =
+    `${total === 0 ? 0 : (remplis / total) * 100}%`;
+
+  mettreAJourProgressionGlobale();
+
+}
+
+function mettreAJourProgressionGlobale() {
+
+  let total = 0;
+  let remplis = 0;
+
+  jeux.forEach((jeu, index) => {
+
+    total += jeu.structures.length;
+
+    const zones = document.querySelectorAll(
+      "#imageStage" + index + " .drop-zone"
+    );
+
+    zones.forEach(zone => {
+
+      if (zone.querySelector(".draggable-label")) {
+        remplis++;
+      }
+
+    });
+
+  });
+
+  document.getElementById("globalProgressText").textContent =
+    `${remplis} / ${total} structures placées`;
+
+  document.getElementById("globalProgressFill").style.width =
+    `${total === 0 ? 0 : (remplis / total) * 100}%`;
+
+}
+
+// ==================================================
+// CORRECTION INDIVIDUELLE
+// ==================================================
+
+function verifier(index) {
+
+  const jeu = jeux[index];
+  const etat = etats[index];
+
+  const total = jeu.structures.length;
+
+  if (total === 0) {
+
+    alert("Ajoute d'abord les structures de cette image dans le code.");
+
+    return;
+
+  }
+
+  let score = 0;
+
+  const zones = document.querySelectorAll(
+    "#imageStage" + index + " .drop-zone"
+  );
+
+  zones.forEach((zone, numero) => {
+
+    zone.classList.remove("correct", "incorrect");
+
+    const etiquette = zone.querySelector(".draggable-label");
+
+    if (etiquette) {
+
+      const reponse = Number(etiquette.dataset.index);
+
+      if (reponse === numero) {
+
+        score++;
+
+        zone.classList.add("correct");
+
+      } else {
+
+        zone.classList.add("incorrect");
+
+      }
+
+    } else {
+
+      zone.classList.add("incorrect");
+
+    }
+
+  });
+
+  const pourcentage = Math.round((score / total) * 100);
+
+  etat.score = score;
+  etat.corrige = true;
+
+  document.getElementById("score" + index).textContent =
+    `${score} / ${total} (${pourcentage} %)`;
+
+  let message = "";
+
+  if (pourcentage === 100) {
+
+    message = "Excellent ! Toutes les structures ont été correctement identifiées.";
+
+  } else if (pourcentage >= 80) {
+
+    message = "Très bon travail ! Tu maîtrises presque toutes les structures.";
+
+  } else if (pourcentage >= 60) {
+
+    message = "Bon travail ! Quelques structures sont encore à revoir.";
+
+  } else {
+
+    message = "Continue à pratiquer ! Tu vas finir par maîtriser ces structures.";
+
+  }
+
+  document.getElementById("message" + index).textContent = message;
+
+  document.getElementById("result" + index).style.display = "block";
+
+  // Verrouiller uniquement les étiquettes de cette image.
+
+  document.querySelectorAll(
+    "#panel" + index + " .draggable-label"
+  ).forEach(etiquette => {
+
+    etiquette.draggable = false;
+
+  });
+
+  mettreAJourResultatGlobal();
+
+  document.getElementById("result" + index).scrollIntoView({
+    behavior: "smooth",
+    block: "nearest"
+  });
+
+}
+
+// ==================================================
+// RÉSULTAT GLOBAL
+// ==================================================
+
+function mettreAJourResultatGlobal() {
+
+  // Le résultat global s'affiche uniquement lorsque
+  // les trois jeux ont des structures et ont été corrigés.
+
+  const resultatsDisponibles = jeux.every((jeu, index) =>
+    jeu.structures.length > 0 && etats[index].corrige
+  );
+
+  const bloc = document.getElementById("finalResult");
+
+  if (!resultatsDisponibles) {
+
+    bloc.style.display = "none";
+
+    return;
+
+  }
+
+  let scoreTotal = 0;
+  let nombreTotal = 0;
+
+  jeux.forEach((jeu, index) => {
+
+    scoreTotal += etats[index].score;
+    nombreTotal += jeu.structures.length;
+
+  });
+
+  const pourcentage = Math.round(
+    (scoreTotal / nombreTotal) * 100
+  );
+
+  document.getElementById("finalScore").textContent =
+    `${scoreTotal} / ${nombreTotal} (${pourcentage} %)`;
+
+  let message = "";
+
+  if (pourcentage === 100) {
+
+    message = "Félicitations ! Tu as parfaitement identifié toutes les structures des trois images.";
+
+  } else if (pourcentage >= 80) {
+
+    message = "Excellent travail ! Tu maîtrises très bien les structures du pont.";
+
+  } else if (pourcentage >= 60) {
+
+    message = "Bon travail ! Quelques structures méritent encore un peu de révision.";
+
+  } else {
+
+    message = "Continue à pratiquer pour consolider tes connaissances.";
+
+  }
+
+  document.getElementById("finalMessage").textContent = message;
+
+  bloc.style.display = "block";
+
+}
+
+// ==================================================
+// NAVIGATION
+// ==================================================
+
+function changerImage(index) {
+
+  imageActive = index;
+
+  document.querySelectorAll(".image-panel").forEach((panel, numero) => {
+
+    panel.classList.toggle("active", numero === index);
+
+  });
+
+  document.querySelectorAll(".nav-btn").forEach((bouton, numero) => {
+
+    bouton.classList.toggle("active", numero === index);
+
+  });
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+
+}
+
+// ==================================================
+// RECOMMENCER UNE IMAGE
+// ==================================================
+
+function recommencer(index) {
+
+  const banque = document.getElementById("labelBank" + index);
+
+  const zones = document.querySelectorAll(
+    "#imageStage" + index + " .drop-zone"
+  );
+
+  // Remettre toutes les étiquettes dans leur banque.
+
+  zones.forEach(zone => {
+
+    const etiquette = zone.querySelector(".draggable-label");
+
+    if (etiquette) {
+      banque.appendChild(etiquette);
+    }
+
+    zone.classList.remove(
+      "has-label",
+      "correct",
+      "incorrect",
+      "drag-over"
+    );
+
+    zone.innerHTML = "";
+
+    afficherPlaceholder(zone);
+
+  });
+
+  // Réinitialiser l'état.
+
+  etats[index].corrige = false;
+  etats[index].score = null;
+  etats[index].glissee = null;
+  etats[index].zoneSource = null;
+
+  // Recréer et mélanger la banque de cette image.
+
+  creerEtiquettes(index);
+
+  document.getElementById("result" + index).style.display = "none";
+
+  mettreAJourProgression(index);
+  mettreAJourResultatGlobal();
+
+}
+
+// ==================================================
+// RECOMMENCER LES TROIS IMAGES
+// ==================================================
+
+function recommencerTout() {
+
+  jeux.forEach((jeu, index) => {
+
+    recommencer(index);
+
+  });
+
+  changerImage(0);
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+
+}
+
+// ==================================================
+// INITIALISATION
+// ==================================================
+
+construireInterfaces();
+
+jeux.forEach((jeu, index) => {
+
+  creerEtiquettes(index);
+
+  const image = document.getElementById("anatomyImage" + index);
+
+  if (image.complete && image.naturalWidth > 0) {
+
+    creerZones(index);
+
+  } else {
+
+    image.addEventListener("load", () => creerZones(index));
+
+    image.addEventListener("error", () => {
+      console.error("Impossible de charger l'image : " + jeu.image);
+    });
+
+  }
+
+});
+
+mettreAJourProgressionGlobale();
+
+</script>
+
+</body>
+</html>
